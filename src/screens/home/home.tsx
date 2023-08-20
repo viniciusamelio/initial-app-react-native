@@ -7,10 +7,11 @@ import { MaskedTextInput } from 'react-native-mask-text';
 import React from "react";
 import { AddressService } from "../../contexts/address/address";
 import { BaseException } from "../../core/exceptions/exceptions";
+import Toast from 'react-native-root-toast';
 
 export default function HomeScreen() {
 
-    const addressService : AddressService = container.resolve("AddressService");
+    const addressService: AddressService = container.resolve("AddressService");
 
     const [formData, setFormData] = React.useState({
         cep: "",
@@ -31,8 +32,17 @@ export default function HomeScreen() {
     const handleCep = async (value: string) => {
         if (value.length == 10) {
             const addressOrError = await addressService.get(value);
-            console.log(addressOrError);
-            if (addressOrError instanceof BaseException)  return;
+            if ( addressOrError instanceof BaseException || addressOrError.city == null || addressOrError.state == null ) {
+                Toast.show('Endereço não encontrado', {
+                    duration: Toast.durations.LONG,
+                    textColor: "#FF2EAB",
+                });
+                return;
+            }
+            Toast.show('Endereço encontrado', {
+                duration: Toast.durations.SHORT,
+                textColor: "#1cffa0"
+            });
             setFormData((currentForm) => ({
                 ...currentForm,
                 street: addressOrError.street,
