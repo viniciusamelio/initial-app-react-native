@@ -1,9 +1,7 @@
-import {injectable} from "tsyringe";
 import { HttpResponse, HttpService, HttpServiceBaseConfig } from "../protocols/protocols";
 import * as axios from 'axios';
 type AxiosClient = axios.AxiosInstance;
 
-@injectable()
 class AxiosHttpService implements HttpService{
 
     constructor() {
