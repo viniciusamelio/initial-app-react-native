@@ -1,31 +1,23 @@
 import { container } from "tsyringe";
-
+import Toast from 'react-native-root-toast';
+import React from "react";
+import { MaskedTextInput } from 'react-native-mask-text';
 import { StatusBar } from "expo-status-bar";
 import { Keyboard, Pressable, SafeAreaView, StyleSheet, TextInput } from "react-native";
+
 import { Input } from "../../styles/styles";
-import { MaskedTextInput } from 'react-native-mask-text';
-import React from "react";
 import { AddressService } from "../../contexts/address/address";
 import { BaseException } from "../../core/exceptions/exceptions";
-import Toast from 'react-native-root-toast';
+import { useAddressStore } from "./store";
 
 export default function HomeScreen() {
 
     const addressService: AddressService = container.resolve("AddressService");
-
-    const [formData, setFormData] = React.useState({
-        cep: "",
-        street: "",
-        district: "",
-        city: "",
-        state: "",
-      });
+    const store = useAddressStore();
+    
     
     const handleForm = (key: string, value: string) => {
-      setFormData((currentForm) => ({
-        ...currentForm,
-        [key]: value,
-      }));
+        store.setAddress({...store.address, [key]: value});
         if (key == "cep") handleCep(value);
     };
 
@@ -43,13 +35,12 @@ export default function HomeScreen() {
                 duration: Toast.durations.SHORT,
                 textColor: "#1cffa0"
             });
-            setFormData((currentForm) => ({
-                ...currentForm,
-                street: addressOrError.street,
-                city: addressOrError.city,
-                state: addressOrError.state,
+            store.setAddress({
+                ...addressOrError,
                 country: "BR",
-            }));
+                cep: store.address.cep
+            });
+            
         }
     }
 
@@ -59,25 +50,25 @@ export default function HomeScreen() {
                 <MaskedTextInput
                     onChangeText={(text) => handleForm("cep", text)}
                     mask="99.999-999"
-                    value={formData.cep}
+                    value={store.address.cep}
                     style={Input.style}
                     keyboardType="numeric"
                     placeholder="CEP"
                     placeholderTextColor={'#ECECEC'} />
                 <TextInput
-                    value={formData.state}
+                    value={store.address.state}
                     placeholder="Estado"
                     placeholderTextColor={'#ECECEC'}
                     onChangeText={(text) => handleForm("state", text)}
                     style={Input.style}/>
                 <TextInput
-                    value={formData.street}
+                    value={store.address.street}
                     placeholder="Rua"
                     placeholderTextColor={'#ECECEC'}
                     onChangeText={(text) => handleForm("street", text)}
                     style={Input.style} />
                 <TextInput
-                    value={formData.city}
+                    value={store.address.city}
                     placeholder="Cidade"
                     placeholderTextColor={'#ECECEC'}
                     onChangeText={(text) => handleForm("city", text)}
