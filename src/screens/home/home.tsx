@@ -10,29 +10,22 @@ import {
   View,
 } from "react-native";
 import Ionicons from "@expo/vector-icons/Ionicons";
-import * as ImagePicker from "expo-image-picker";
 import { Image } from "expo-image";
 
 import { Input } from "../../styles/styles";
 import { useAddressStore } from "./store";
 import { DefaultButton, DefaultInput } from "../../components/components";
 import { AddressController } from "./presenter";
+import { ImagePickerController } from "../../core/controllers/imagePickerController";
 
 export default function HomeScreen() {
   const controller = new AddressController(container.resolve("AddressService"), useAddressStore());
+  const imagePickerController : ImagePickerController = container.resolve("ImagePickerController");
   const [image, setImage] = useState<string | undefined>();
 
   const pickImage = async () => {
-    const result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.Images,
-      allowsEditing: true,
-      aspect: [4, 4],
-      quality: 1,
-    });
-
-    if (!result.canceled && result.assets.length > 0) {
-      setImage(result.assets[0].uri);
-    }
+    const result = await imagePickerController.pickImage();
+    setImage(result?.uri);
   };
 
   return (

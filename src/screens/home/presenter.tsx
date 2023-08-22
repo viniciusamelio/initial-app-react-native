@@ -3,7 +3,7 @@ import { AddressService } from "../../contexts/address/address";
 import { BaseException } from "../../core/exceptions/exceptions";
 import { AddressFormState } from "./store";
 
-type AddressPresenter = {
+interface AddressPresenter{
   handleForm : (key: string, value: string) => void;
   handleCep : (value: string)=> Promise<void>;
   store: AddressFormState;
