@@ -9,7 +9,7 @@ type AddressForm = {
     country?: string
 }
 
-type AddressFormState = {
+export type AddressFormState = {
     address: AddressForm,
     setAddress: (address : AddressForm) => void;
 }

@@ -1,5 +1,4 @@
 import { container } from "tsyringe";
-import Toast from "react-native-root-toast";
 import React, { useState } from "react";
 import { StatusBar } from "expo-status-bar";
 import {
@@ -15,46 +14,14 @@ import * as ImagePicker from "expo-image-picker";
 import { Image } from "expo-image";
 
 import { Input } from "../../styles/styles";
-import { AddressService } from "../../contexts/address/address";
-import { BaseException } from "../../core/exceptions/exceptions";
 import { useAddressStore } from "./store";
 import { DefaultButton, DefaultInput } from "../../components/components";
+import { AddressController } from "./presenter";
 
 export default function HomeScreen() {
-  const addressService: AddressService = container.resolve("AddressService");
-  const store = useAddressStore();
+  const controller = new AddressController(container.resolve("AddressService"), useAddressStore());
   const [image, setImage] = useState<string | undefined>();
 
-  const handleForm = (key: string, value: string) => {
-    store.setAddress({ ...store.address, [key]: value });
-    if (key == "cep") handleCep(value);
-  };
-
-  const handleCep = async (value: string) => {
-    if (value.length == 8) {
-      const addressOrError = await addressService.get(value);
-      if (
-        addressOrError instanceof BaseException ||
-        addressOrError.city == null ||
-        addressOrError.state == null
-      ) {
-        Toast.show("Endereço não encontrado", {
-          duration: Toast.durations.LONG,
-          textColor: "#FF2EAB",
-        });
-        return;
-      }
-      Toast.show("Endereço encontrado", {
-        duration: Toast.durations.SHORT,
-        textColor: "#1cffa0",
-      });
-      store.setAddress({
-        ...addressOrError,
-        country: "BR",
-        cep: store.address.cep,
-      });
-    }
-  };
   const pickImage = async () => {
     const result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.Images,
@@ -72,33 +39,33 @@ export default function HomeScreen() {
     <Pressable style={styles.scaffold} onPress={() => Keyboard.dismiss()}>
       <SafeAreaView style={styles.scaffold}>
         <DefaultInput
-          onChangeText={(text: string, raw?: string) => handleForm("cep", raw!)}
+          onChangeText={(text: string, raw?: string) => controller.handleForm("cep", raw!)}
           mask="99.999-999"
-          value={store.address.cep}
+          value={controller.store.address.cep}
           style={Input.style}
           keyboardType="numeric"
           placeholder="CEP"
           placeholderTextColor={"#ECECEC"}
         />
         <DefaultInput
-          value={store.address.state}
+          value={controller.store.address.state}
           placeholder="Estado"
           placeholderTextColor={"#ECECEC"}
-          onChangeText={(text: string) => handleForm("state", text)}
+          onChangeText={(text: string) => controller.handleForm("state", text)}
           style={Input.style}
         />
         <DefaultInput
-          value={store.address.street}
+          value={controller.store.address.street}
           placeholder="Rua"
           placeholderTextColor={"#ECECEC"}
-          onChangeText={(text: string) => handleForm("street", text)}
+          onChangeText={(text: string) => controller.handleForm("street", text)}
           style={Input.style}
         />
         <DefaultInput
-          value={store.address.city}
+          value={controller.store.address.city}
           placeholder="Cidade"
           placeholderTextColor={"#ECECEC"}
-          onChangeText={(text: string) => handleForm("city", text)}
+          onChangeText={(text: string) => controller.handleForm("city", text)}
           style={Input.style}
         />
         <Pressable onPress={pickImage}>
