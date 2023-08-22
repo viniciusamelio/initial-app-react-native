@@ -1,3 +1,3 @@
 import DefaultInput from "./input/input";
-
-export { DefaultInput };
+import DefaultButton from "./button/button";
+export { DefaultInput, DefaultButton };
