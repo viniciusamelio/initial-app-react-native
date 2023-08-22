@@ -1,14 +1,14 @@
 import { container } from "tsyringe";
 import Toast from 'react-native-root-toast';
 import React from "react";
-import { MaskedTextInput } from 'react-native-mask-text';
 import { StatusBar } from "expo-status-bar";
-import { Keyboard, Pressable, SafeAreaView, StyleSheet, TextInput } from "react-native";
+import { Keyboard, Pressable, SafeAreaView, StyleSheet } from "react-native";
 
 import { Input } from "../../styles/styles";
 import { AddressService } from "../../contexts/address/address";
 import { BaseException } from "../../core/exceptions/exceptions";
 import { useAddressStore } from "./store";
+import { DefaultInput } from "../../components/components";
 
 export default function HomeScreen() {
 
@@ -22,7 +22,7 @@ export default function HomeScreen() {
     };
 
     const handleCep = async (value: string) => {
-        if (value.length == 10) {
+        if (value.length == 8) {
             const addressOrError = await addressService.get(value);
             if ( addressOrError instanceof BaseException || addressOrError.city == null || addressOrError.state == null ) {
                 Toast.show('Endereço não encontrado', {
@@ -47,31 +47,31 @@ export default function HomeScreen() {
     return (
         <Pressable style={styles.scaffold} onPress={()=>Keyboard.dismiss()}>
             <SafeAreaView style={styles.scaffold}>
-                <MaskedTextInput
-                    onChangeText={(text) => handleForm("cep", text)}
+                <DefaultInput
+                    onChangeText={(text: string, raw?:string) => handleForm("cep", raw!)}
                     mask="99.999-999"
                     value={store.address.cep}
                     style={Input.style}
                     keyboardType="numeric"
                     placeholder="CEP"
                     placeholderTextColor={'#ECECEC'} />
-                <TextInput
+                <DefaultInput
                     value={store.address.state}
                     placeholder="Estado"
                     placeholderTextColor={'#ECECEC'}
-                    onChangeText={(text) => handleForm("state", text)}
+                    onChangeText={(text: string)=> handleForm("state",text)}
                     style={Input.style}/>
-                <TextInput
+                <DefaultInput
                     value={store.address.street}
                     placeholder="Rua"
                     placeholderTextColor={'#ECECEC'}
-                    onChangeText={(text) => handleForm("street", text)}
+                    onChangeText={(text:string) => handleForm("street", text)}
                     style={Input.style} />
-                <TextInput
+                <DefaultInput
                     value={store.address.city}
                     placeholder="Cidade"
                     placeholderTextColor={'#ECECEC'}
-                    onChangeText={(text) => handleForm("city", text)}
+                    onChangeText={(text:string) => handleForm("city", text)}
                     style={Input.style}/>
             </SafeAreaView>
             <StatusBar style="light"/>
