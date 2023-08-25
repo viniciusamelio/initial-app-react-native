@@ -17,8 +17,10 @@ type DefaultButtonStyle = {
     marginTop?: number | undefined
 }
 
-const DefaultButton = ({children, style} : DefaultButtonProps) =>(
-    <Pressable style={{
+const DefaultButton = ({children, style, onPressed} : DefaultButtonProps) =>(
+    <Pressable
+        onPress={onPressed}
+        style={{
         backgroundColor: style?.backgroundColor ?? "#0F0F0F",
         paddingVertical: style?.padingVertical ?? 12,
         paddingHorizontal: style?.paddingHorizontal ?? 24,

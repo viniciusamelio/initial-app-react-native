@@ -5,32 +5,33 @@ import {
   Keyboard,
   Pressable,
   SafeAreaView,
-  StyleSheet,
+
   Text,
   View,
 } from "react-native";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { Image } from "expo-image";
 
-import { Input } from "../../styles/styles";
+import { Input, Scaffold } from "../../styles/styles";
 import { useAddressStore } from "./store";
 import { DefaultButton, DefaultInput } from "../../components/components";
 import { AddressController } from "./presenter";
 import { ImagePickerController } from "../../core/controllers/imagePickerController";
+import { router } from 'expo-router';
 
 export default function HomeScreen() {
   const controller = new AddressController(container.resolve("AddressService"), useAddressStore());
   const imagePickerController : ImagePickerController = container.resolve("ImagePickerController");
   const [image, setImage] = useState<string | undefined>();
-
+  const validated = image!=null && controller.store.address.cep?.length == 8 && controller.store.address.city != null && controller.store.address.state != null;
   const pickImage = async () => {
     const result = await imagePickerController.pickImage();
     setImage(result?.uri);
   };
 
   return (
-    <Pressable style={styles.scaffold} onPress={() => Keyboard.dismiss()}>
-      <SafeAreaView style={styles.scaffold}>
+    <Pressable style={Scaffold.style} onPress={() => Keyboard.dismiss()}>
+      <SafeAreaView style={Scaffold.style}>
         <DefaultInput
           onChangeText={(text: string, raw?: string) => controller.handleForm("cep", raw!)}
           mask="99.999-999"
@@ -93,7 +94,11 @@ export default function HomeScreen() {
         </Pressable>
 
         <DefaultButton
-          onPressed={() => {}}
+          onPressed={() => {
+            if (validated) {
+              router.push("review/review?address="+JSON.stringify(controller.store.address));
+            }
+          }}
           style={{
             backgroundColor: "#0F0F0F",
             marginTop: 20,
@@ -106,11 +111,4 @@ export default function HomeScreen() {
   );
 }
 
-const styles = StyleSheet.create({
-  scaffold: {
-    flex: 1,
-    alignItems: "center",
-    justifyContent: "center",
-    backgroundColor: "#161616",
-  },
-});
+

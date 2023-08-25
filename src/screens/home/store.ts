@@ -1,6 +1,6 @@
 import { create } from 'zustand'
 
-type AddressForm = {
+export type AddressForm = {
     cep?: string,
     street?: string,
     district?: string,
